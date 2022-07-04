@@ -1,9 +1,17 @@
 use std::{self, env::{self, args}};
 use walkdir::{self,WalkDir};
 use colored::*;
+use dirs;
 
 
 fn main() {
+
+    let home_dir = match dirs::home_dir() {
+        Some(i) => i,
+        None => panic!()
+    };
+
+    let home_dir = home_dir.to_str().unwrap();
 
     let filename = match args().nth(1) {
         Some(i) => i,
@@ -28,7 +36,11 @@ Use => path SEARCH_TERM PATH[optional]
         }
     };
     
-    let path = path.as_str();
+    let mut path = path.as_str();
+
+    if path == "HOMEDIR" {
+        path = home_dir
+    }
 
     println!("Searching for '{}' in '{}'", filename.bold().bright_blue(), path.bold().bright_green());
 
