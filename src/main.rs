@@ -48,14 +48,14 @@ Use => path SEARCH_TERM PATH[optional]
             println!("Found a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
         }
     }
-    else if almost_matches.len() > 0 {
-        for m in almost_matches {
-            println!("Found almost a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
-        }
-    }
     else {
         println!("No matches found for {}", filename.bright_red());
     }
+    if almost_matches.len() > 0 {
+        for m in almost_matches {
+            println!("Found almost a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
+        }
+    }   
     
 }
 
