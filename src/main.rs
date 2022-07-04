@@ -33,14 +33,24 @@ Use => path SEARCH_TERM PATH[optional]
     println!("Searching for '{}' in '{}'", filename.bold().bright_blue(), path.bold().bright_green());
 
     let entry = WalkDir::new(path);
+    let entry_two = WalkDir::new(path);
 
     let matches = match search(entry, filename.as_str()) {
+        Some(i) => i,
+        None => vec![]
+    };
+    let almost_matches = match almost_search(entry_two, filename.as_str()) {
         Some(i) => i,
         None => vec![]
     };
     if matches.len() > 0 {
         for m in matches {
             println!("Found a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
+        }
+    }
+    else if almost_matches.len() > 0 {
+        for m in almost_matches {
+            println!("Found almost a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
         }
     }
     else {
@@ -62,7 +72,7 @@ fn search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
         };
         let p = entry.path().to_str().unwrap();
         let file = entry.file_name().to_str().unwrap();
-        if file == filename {
+        if file.to_lowercase() == filename.to_lowercase() {
             matches.push(p.to_string().clone());
         }
     }
@@ -70,4 +80,28 @@ fn search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
         return None
     }
     Some(matches)
+}
+
+fn almost_search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
+
+    let mut almost_matches = vec![];
+
+    for e in entry {
+        let entry = match e {
+            Ok(i) => i,
+            Err(_) => {
+                continue;
+            }
+        };
+        let p = entry.path().to_str().unwrap();
+        let file = entry.file_name().to_str().unwrap();
+        let file = file.to_lowercase();
+        if file.contains(filename.to_lowercase().as_str()) {
+            almost_matches.push(p.to_string().clone());
+        }
+    }
+    if almost_matches.len() == 0 {
+        return None
+    }
+    Some(almost_matches)
 }
