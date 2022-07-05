@@ -20,9 +20,7 @@ fn main() {
         Some(i) => i,
         None => "output.txt".to_string(),
     };
-
-    println!("{:#?}", args());
-
+    
     println!(
         "Searching for '{}' in '{}'",
         filename.bold().bright_blue(),
