@@ -1,11 +1,9 @@
 use colored::*;
-use dirs;
 use path::*;
 use std::{
     self,
-    env::{self, args},
-    fs::{self, *},
-    io::{self, Write},
+    env::args,
+    fs
 };
 use walkdir::{self, WalkDir};
 
@@ -74,5 +72,5 @@ fn main() {
         }
     }
     fs::write(output_file_name, contents)
-        .unwrap_or_else(|x| println!("{}", "Error in writing to file".red()));
+        .unwrap_or_else(|_| println!("{}", "Error in writing to file".red()));
 }
