@@ -1,15 +1,16 @@
-use std::{self, env::{self, args}};
-use walkdir::{self,WalkDir};
 use colored::*;
 use dirs;
 use path::*;
-
+use std::{
+    self,
+    env::{self, args},
+};
+use walkdir::{self, WalkDir};
 
 fn main() {
-
     let home_dir = match dirs::home_dir() {
         Some(i) => i,
-        None => panic!()
+        None => panic!(),
     };
 
     let home_dir = home_dir.to_str().unwrap();
@@ -17,12 +18,14 @@ fn main() {
     let filename = match args().nth(1) {
         Some(i) => i,
         None => {
-            println!("{}", 
-            "
+            println!(
+                "{}",
+                "
 \nERROR: Missing arguments
 Use => path SEARCH_TERM PATH[optional]
-            ".red()
-        );
+            "
+                .red()
+            );
             panic!("");
         }
     };
@@ -36,38 +39,48 @@ Use => path SEARCH_TERM PATH[optional]
             pathbuf
         }
     };
-    
+
     let mut path = path.as_str();
 
     if path == "HOMEDIR" {
         path = home_dir
     }
 
-    println!("Searching for '{}' in '{}'", filename.bold().bright_blue(), path.bold().bright_green());
+    println!(
+        "Searching for '{}' in '{}'",
+        filename.bold().bright_blue(),
+        path.bold().bright_green()
+    );
 
     let entry = WalkDir::new(path);
     let entry_two = WalkDir::new(path);
 
     let matches = match search(entry, filename.as_str()) {
         Some(i) => i,
-        None => vec![]
+        None => vec![],
     };
     let almost_matches = match almost_search(entry_two, filename.as_str()) {
         Some(i) => i,
-        None => vec![]
+        None => vec![],
     };
     if matches.len() > 0 {
         for m in matches {
-            println!("Found a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
+            println!(
+                "Found a match for '{}' at: {}",
+                filename.bright_blue(),
+                m.bright_green()
+            );
         }
-    }
-    else {
+    } else {
         println!("No matches found for {}", filename.bright_red());
     }
     if almost_matches.len() > 0 {
         for m in almost_matches {
-            println!("Found almost a match for '{}' at: {}", filename.bright_blue(), m.bright_green());
+            println!(
+                "Found almost a match for '{}' at: {}",
+                filename.bright_blue(),
+                m.bright_green()
+            );
         }
-    }   
-    
+    }
 }

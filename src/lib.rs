@@ -1,8 +1,6 @@
 use walkdir::{self, WalkDir};
 
-
 pub fn search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
-
     let mut matches = vec![];
 
     for e in entry {
@@ -19,13 +17,12 @@ pub fn search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
         }
     }
     if matches.len() == 0 {
-        return None
+        return None;
     }
     Some(matches)
 }
 
 pub fn almost_search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
-
     let mut almost_matches = vec![];
 
     for e in entry {
@@ -43,7 +40,7 @@ pub fn almost_search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
         }
     }
     if almost_matches.len() == 0 {
-        return None
+        return None;
     }
     Some(almost_matches)
 }
