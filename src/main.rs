@@ -3,51 +3,28 @@ use dirs;
 use path::*;
 use std::{
     self,
-    env::{self, args},
-    path::Path,
+    fs::{self,*},
+    env::{self,args},
+    io::{self, Write}
 };
 use walkdir::{self, WalkDir};
 
 fn main() {
-    let home_dir = match dirs::home_dir() {
-        Some(i) => i,
-        None => panic!(),
-    };
 
-    let home_dir = home_dir.to_str().unwrap();
+    let home_dir = get_home_dir();
+    let home_dir = home_dir.as_str();
 
-    let filename = match args().nth(1) {
-        Some(i) => i,
-        None => {
-            println!(
-                "{}",
-                "
-\nERROR: Missing arguments
-Use => path SEARCH_TERM PATH[optional]
-            "
-                .red()
-            );
-            panic!("");
-        }
-    };
+    let filename = get_file_name();
 
-    let path = match args().nth(2) {
-        Some(i) => i,
-        None => {
-            let pathbuf = env::current_dir().unwrap();
-            let pathbuf = pathbuf.to_str().unwrap();
-            let pathbuf = pathbuf.to_string();
-            pathbuf
-        }
-    };
-
-    let path = path.replace("HOMEDIR", home_dir);
+    let path = get_path(home_dir);
     let path = path.as_str();
 
-    if !(Path::new(path.clone()).is_dir()) {
-        println!("{}", format!("\nError\nPath doesn't exit: {}\n", &path).red());
-        panic!("");
-    }
+    let output_file_name = match args().nth(3) {
+        Some(i) => i,
+        None => "output.txt".to_string()
+    };
+
+    println!("{:#?}", args());
 
     println!(
         "Searching for '{}' in '{}'",
@@ -66,6 +43,8 @@ Use => path SEARCH_TERM PATH[optional]
         Some(i) => i,
         None => vec![],
     };
+
+    let mut contents = "".to_string();
     if matches.len() > 0 {
         for m in matches {
             println!(
@@ -73,6 +52,10 @@ Use => path SEARCH_TERM PATH[optional]
                 filename.bright_blue(),
                 m.bright_green()
             );
+            if !&output_file_name.is_empty() {
+                let n = format!("\nFound a match for '{}' at: {}\n", filename, m);
+                contents += n.as_str();
+            }
         }
     } else {
         println!("No matches found for {}", filename.bright_red());
@@ -84,6 +67,34 @@ Use => path SEARCH_TERM PATH[optional]
                 filename.bright_blue(),
                 m.bright_green()
             );
+
+            if !&output_file_name.is_empty() {
+                let n = format!("\nFound a almost a match for '{}' at: {}\n", filename, m);
+                contents += n.as_str();
+            }
         }
     }
+    fs::write(output_file_name, contents);
+}
+
+fn create_file(output_file_name: &str) -> fs::File {
+    let file = match fs::File::open(output_file_name) {
+        Ok(i) => i,
+        Err(error) => {
+            match error.kind() {
+                io::ErrorKind::NotFound => {
+                    let f = match File::create(output_file_name) {
+                        Ok(i) => i,
+                        Err(_) => {
+                            println!("{}", format!("\nCan't open or make file {}\n", output_file_name).red());
+                            panic!("");
+                        }
+                    };
+                    f
+                },
+                _ => panic!("")
+            }
+        }
+    };
+    file
 }
