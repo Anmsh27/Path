@@ -4,6 +4,7 @@ use path::*;
 use std::{
     self,
     env::{self, args},
+    path::Path,
 };
 use walkdir::{self, WalkDir};
 
@@ -40,10 +41,12 @@ Use => path SEARCH_TERM PATH[optional]
         }
     };
 
-    let mut path = path.as_str();
+    let path = path.replace("HOMEDIR", home_dir);
+    let path = path.as_str();
 
-    if path == "HOMEDIR" {
-        path = home_dir
+    if !(Path::new(path.clone()).is_dir()) {
+        println!("{}", format!("\nError\nPath doesn't exit: {}\n", &path).red());
+        panic!("");
     }
 
     println!(
