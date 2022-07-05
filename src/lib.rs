@@ -1,6 +1,11 @@
-use walkdir::{self, WalkDir};
-use std::{env::{self,args}, path::Path};
 use colored::*;
+use std::{
+    env::{self, args},
+    fs::{self, File},
+    io,
+    path::Path,
+};
+use walkdir::{self, WalkDir};
 
 pub fn search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
     let mut matches = vec![];
@@ -22,6 +27,29 @@ pub fn search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
         return None;
     }
     Some(matches)
+}
+
+pub fn create_file(output_file_name: &str) -> fs::File {
+    let file = match fs::File::open(output_file_name) {
+        Ok(i) => i,
+        Err(error) => match error.kind() {
+            io::ErrorKind::NotFound => {
+                let f = match File::create(output_file_name) {
+                    Ok(i) => i,
+                    Err(_) => {
+                        println!(
+                            "{}",
+                            format!("\nCan't open or make file {}\n", output_file_name).red()
+                        );
+                        panic!("");
+                    }
+                };
+                f
+            }
+            _ => panic!(""),
+        },
+    };
+    file
 }
 
 pub fn almost_search(entry: WalkDir, filename: &str) -> Option<Vec<String>> {
@@ -75,7 +103,7 @@ Use => path SEARCH_TERM PATH[optional]
         }
     };
     filename
-} 
+}
 
 pub fn get_path<'a>(home_dir: &'a str) -> String {
     let path = match args().nth(2) {
@@ -91,10 +119,12 @@ pub fn get_path<'a>(home_dir: &'a str) -> String {
     let path = path.replace("HOMEDIR", home_dir);
 
     if !(Path::new(&path.clone()).is_dir()) {
-        println!("{}", format!("\nError\nPath doesn't exit: {}\n", &path).red());
+        println!(
+            "{}",
+            format!("\nError\nPath doesn't exit: {}\n", &path).red()
+        );
         panic!("");
     };
 
     path
 }
-

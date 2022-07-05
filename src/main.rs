@@ -3,14 +3,13 @@ use dirs;
 use path::*;
 use std::{
     self,
-    fs::{self,*},
-    env::{self,args},
-    io::{self, Write}
+    env::{self, args},
+    fs::{self, *},
+    io::{self, Write},
 };
 use walkdir::{self, WalkDir};
 
 fn main() {
-
     let home_dir = get_home_dir();
     let home_dir = home_dir.as_str();
 
@@ -21,7 +20,7 @@ fn main() {
 
     let output_file_name = match args().nth(3) {
         Some(i) => i,
-        None => "output.txt".to_string()
+        None => "output.txt".to_string(),
     };
 
     println!("{:#?}", args());
@@ -74,27 +73,6 @@ fn main() {
             }
         }
     }
-    fs::write(output_file_name, contents);
-}
-
-fn create_file(output_file_name: &str) -> fs::File {
-    let file = match fs::File::open(output_file_name) {
-        Ok(i) => i,
-        Err(error) => {
-            match error.kind() {
-                io::ErrorKind::NotFound => {
-                    let f = match File::create(output_file_name) {
-                        Ok(i) => i,
-                        Err(_) => {
-                            println!("{}", format!("\nCan't open or make file {}\n", output_file_name).red());
-                            panic!("");
-                        }
-                    };
-                    f
-                },
-                _ => panic!("")
-            }
-        }
-    };
-    file
+    fs::write(output_file_name, contents)
+        .unwrap_or_else(|x| println!("{}", "Error in writing to file".red()));
 }
